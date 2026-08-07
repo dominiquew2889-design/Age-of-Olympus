@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#10091b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Age of Olympus</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <section id="start-screen" class="screen active">
+      <div class="hero-banner">
+        <div class="hero-glow"></div>
+        <div class="temple-icon">🏛️</div>
+        <p class="eyebrow">A GREEK MYTHOLOGY STRATEGY GAME</p>
+        <h1>AGE OF <span>OLYMPUS</span></h1>
+        <p class="intro">Rule Greece, command heroes, survive living monsters, and shape a mythology that changes every year.</p>
+      </div>
+
+      <div class="start-card">
+        <h2>Choose Your Deity</h2>
+        <div id="god-grid" class="god-grid"></div>
+        <button id="begin-button" class="primary-button" disabled>Select a God</button>
+        <button id="continue-button" class="secondary-button hidden">Continue Saved Game</button>
+      </div>
+    </section>
+
+    <section id="game-screen" class="screen">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">DIVINE REIGN</p>
+          <h2 id="god-title">Olympian</h2>
+        </div>
+        <div class="top-actions">
+          <button id="notification-bell" class="notification-bell" aria-label="Open alerts">🔔<span id="notification-badge" class="notification-badge hidden">0</span></button>
+          <button id="advance-year-button" class="year-button">📅 Advance Year</button>
+          <button id="save-button" class="icon-button">💾</button>
+        </div>
+      </header>
+
+      <div class="resource-strip">
+        <div><span>✨</span><strong id="faith-value">0</strong><small>Faith</small></div>
+        <div><span>⚡</span><strong id="favor-value">0</strong><small>Favor</small></div>
+        <div><span>🪙</span><strong id="gold-value">0</strong><small>Gold</small></div>
+        <div><span>🏛️</span><strong id="prestige-value">0</strong><small>Prestige</small></div>
+      </div>
+
+      <main id="main-content">
+        <section id="world-view" class="view active">
+          <div class="section-heading">
+            <div><p class="eyebrow">THE GREEK WORLD</p><h2>Interactive Map</h2></div>
+            <span id="year-label" class="pill">Year 1</span>
+          </div>
+          <div id="world-summary" class="summary-card"></div>
+          <div class="map-toolbar">
+            <button class="map-filter active" data-map-filter="all">All</button>
+            <button class="map-filter" data-map-filter="cities">Cities</button>
+            <button class="map-filter" data-map-filter="heroes">Heroes</button>
+            <button class="map-filter" data-map-filter="monsters">Monsters</button>
+            <button class="map-filter" data-map-filter="events">Events</button>
+            <button class="map-filter" data-map-filter="temples">Temples</button>
+            <button class="map-filter" data-map-filter="prayers">Prayers</button>
+          </div>
+          <div id="greece-map" class="greece-map">
+            <div class="cloud cloud-a">☁️</div>
+            <div class="cloud cloud-b">☁️</div>
+            <div class="ship ship-a">⛵</div>
+            <div class="map-sea-label">AEGEAN SEA</div>
+            <div class="map-land mainland"></div>
+            <div class="map-land peloponnese"></div>
+            <div class="map-land crete-island"></div>
+            <div class="map-land asia-minor"></div>
+            <svg class="route-layer" viewBox="0 0 1000 760" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M370 250 C430 300 470 350 520 430"></path>
+              <path d="M370 250 C300 340 300 430 330 520"></path>
+              <path d="M520 430 C590 420 650 380 730 300"></path>
+              <path d="M520 430 C470 520 520 610 600 680"></path>
+              <path d="M330 520 C390 500 450 470 520 430"></path>
+            </svg>
+            <div id="map-markers"></div>
+          </div>
+          <div class="map-legend">
+            <span><i class="legend-dot player"></i>Your influence</span>
+            <span><i class="legend-dot rival"></i>Rival control</span>
+            <span><i class="legend-dot sacred"></i>Sacred capital</span>
+            <span><i class="legend-dot danger"></i>Monster danger</span>
+          </div>
+          <div id="selected-map-panel" class="selected-map-panel empty">Tap a city, hero, monster, or event on the map.</div>
+        </section>
+
+        <section id="cities-view" class="view">
+          <div class="section-heading"><div><p class="eyebrow">LIVING CITIES</p><h2>City Districts</h2></div><span id="building-count" class="pill">0 Projects</span></div>
+          <div id="city-development-list" class="stack"></div>
+        </section>
+
+        <section id="training-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">HERO MASTERY</p><h2>Training & Skills</h2></div>
+            <span id="training-count" class="pill">0 Training</span>
+          </div>
+          <div id="training-summary" class="summary-card"></div>
+          <div id="training-list" class="stack"></div>
+        </section>
+
+        <section id="kingdoms-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">LIVING KINGDOMS</p><h2>Kingdoms & Wars</h2></div>
+            <span id="war-count" class="pill">0 Wars</span>
+          </div>
+          <div id="kingdom-summary" class="summary-card"></div>
+          <div id="kingdom-list" class="stack"></div>
+        </section>
+
+        <section id="economy-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">INTERACTIVE ECONOMY</p><h2>Earn Gold</h2></div>
+            <span id="income-label" class="pill">0 / Year</span>
+          </div>
+          <div id="income-summary" class="summary-card"></div>
+          <div id="gold-action-list" class="stack"></div>
+          <div class="section-heading subheading">
+            <div><p class="eyebrow">ACTIVE ENTERPRISES</p><h2>Trade & Investments</h2></div>
+          </div>
+          <div id="enterprise-list" class="stack"></div>
+        </section>
+
+        <section id="artifacts-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">RELICS OF MYTH</p><h2>Artifacts</h2></div>
+            <span id="artifact-count" class="pill">0 Found</span>
+          </div>
+          <div id="artifact-list" class="stack"></div>
+        </section>
+
+
+
+
+
+
+
+
+
+
+
+        <section id="relationships-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">FATE & GENERATIONAL SAGAS</p><h2>Gods, Titans & Courtship</h2></div>
+            <span id="relationship-roster-count" class="pill">0 Immortals</span>
+          </div>
+          <div id="relationship-summary" class="summary-card"></div>
+          <div class="map-toolbar">
+            <button class="relationship-filter active" data-relationship-filter="all">All</button>
+            <button class="relationship-filter" data-relationship-filter="olympian">Olympians</button>
+            <button class="relationship-filter" data-relationship-filter="titan">Titans</button>
+            <button class="relationship-filter" data-relationship-filter="romance">Romance</button>
+            <button class="relationship-filter" data-relationship-filter="married">Married</button>
+          </div>
+          <div id="relationship-roster-list" class="stack"></div>
+        </section>
+
+        <section id="divine-houses-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">DIVINE HOUSES</p><h2>Immortal Dynasties</h2></div>
+            <span id="divine-house-count" class="pill">0 Houses</span>
+          </div>
+          <div id="divine-house-summary" class="summary-card"></div>
+          <div id="divine-house-list" class="stack"></div>
+        </section>
+
+        <section id="divine-family-view" class="view">
+          <div class="section-heading"><div><p class="eyebrow">DIVINE FAMILY</p><h2>Marriage, Children & Legacy</h2></div><span id="divine-family-status" class="pill">Unwed</span></div>
+          <div id="divine-family-summary" class="summary-card"></div><div id="divine-spouse-list" class="stack"></div>
+          <div class="section-heading subheading"><div><p class="eyebrow">IMMORTAL CHILDREN</p><h2>Young Gods</h2></div></div><div id="immortal-child-list" class="stack"></div>
+        </section>
+        <section id="family-tree-view" class="view">
+          <div class="section-heading"><div><p class="eyebrow">DIVINE BLOODLINES</p><h2>Family Tree</h2></div><span id="family-tree-count" class="pill">0 Members</span></div>
+          <div id="family-tree-summary" class="summary-card"></div><div id="family-tree-list" class="stack"></div>
+        </section>
+        <section id="ascension-view" class="view">
+          <div class="section-heading"><div><p class="eyebrow">ASCENSION COUNCIL</p><h2>Demigod Immortality</h2></div><span id="ascension-count" class="pill">0 Eligible</span></div>
+          <div id="ascension-summary" class="summary-card"></div><div id="ascension-list" class="stack"></div>
+        </section>
+
+        <section id="citizens-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">LIVING CITIZENS 2.0</p><h2>Mortal Lives</h2></div>
+            <span id="living-citizen-count" class="pill">0 Citizens</span>
+          </div>
+          <div id="living-citizen-summary" class="summary-card"></div>
+          <div class="map-toolbar">
+            <button class="citizen-filter active" data-citizen-filter="all">All</button>
+            <button class="citizen-filter" data-citizen-filter="priest">Priests</button>
+            <button class="citizen-filter" data-citizen-filter="merchant">Merchants</button>
+            <button class="citizen-filter" data-citizen-filter="soldier">Soldiers</button>
+            <button class="citizen-filter" data-citizen-filter="family">Families</button>
+          </div>
+          <div id="living-citizen-list" class="stack"></div>
+        </section>
+
+        <section id="prayers-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">MORTAL PETITIONS</p><h2>Interactive Prayers</h2></div>
+            <span id="prayer-count-label" class="pill">0 Waiting</span>
+          </div>
+          <div id="prayer-summary" class="summary-card"></div>
+          <div id="prayer-list" class="stack"></div>
+        </section>
+
+        <section id="temples-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">SACRED CENTERS</p><h2>Interactive Temples</h2></div>
+            <span id="temple-count-label" class="pill">0 Temples</span>
+          </div>
+          <div id="temple-summary" class="summary-card"></div>
+          <div id="temple-list" class="stack"></div>
+        </section>
+
+        <section id="living-wars-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">DYNAMIC WARFARE</p><h2>Living Wars</h2></div>
+            <span id="living-war-count" class="pill">0 Wars</span>
+          </div>
+          <div id="living-war-summary" class="summary-card"></div>
+          <div id="living-war-list" class="stack"></div>
+        </section>
+
+        <section id="creatures-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">LEGENDARY ECOSYSTEM</p><h2>Roaming Creatures</h2></div>
+            <span id="creature-count-label" class="pill">0 Creatures</span>
+          </div>
+          <div id="creature-summary" class="summary-card"></div>
+          <div id="creature-list" class="stack"></div>
+        </section>
+
+        <section id="adventures-view" class="view">
+          <div class="section-heading"><div><p class="eyebrow">FATE & GENERATIONAL SAGAS</p><h2>Questlines & Exploration</h2></div><span id="adventure-status-label" class="pill">No Active Quest</span></div>
+          <div id="adventure-summary" class="summary-card"></div>
+          <div id="legendary-quest-list" class="stack"></div>
+          <div class="section-heading subheading"><div><p class="eyebrow">MYTHIC WORLD</p><h2>Legendary Locations</h2></div></div>
+          <div id="adventure-location-list" class="stack"></div>
+        </section>
+        <section id="dynasties-view" class="view">
+          <div class="section-heading"><div><p class="eyebrow">ROYAL & HEROIC HOUSES</p><h2>Dynasties</h2></div><span id="dynasty-count-label" class="pill">0 Houses</span></div>
+          <div id="dynasty-summary" class="summary-card"></div>
+          <div id="dynasty-list" class="stack"></div>
+        </section>
+        <section id="alerts-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">INTERACTIVE NOTIFICATIONS</p><h2>Alerts Center</h2></div>
+            <span id="alerts-count-label" class="pill">0 Active</span>
+          </div>
+          <div id="alerts-summary" class="summary-card"></div>
+          <div class="alert-filter-row">
+            <button class="alert-filter active" data-alert-filter="active">Active</button>
+            <button class="alert-filter" data-alert-filter="critical">Critical</button>
+            <button class="alert-filter" data-alert-filter="urgent">Urgent</button>
+            <button class="alert-filter" data-alert-filter="important">Important</button>
+            <button class="alert-filter" data-alert-filter="history">History</button>
+          </div>
+          <div id="alerts-list" class="stack"></div>
+
+          <div class="section-heading subheading">
+            <div><p class="eyebrow">LIVE WORLD ACTIVITY</p><h2>Activity Feed</h2></div>
+          </div>
+          <div id="activity-feed-list" class="stack"></div>
+        </section>
+
+        <section id="living-ai-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">LIVING AI</p><h2>Autonomous Characters</h2></div>
+            <span id="living-ai-status" class="pill">World Thinking</span>
+          </div>
+          <div id="living-ai-summary" class="summary-card"></div>
+          <div id="living-ai-character-list" class="stack"></div>
+
+          <div class="section-heading subheading">
+            <div><p class="eyebrow">EMERGENT STORIES</p><h2>Independent Decisions</h2></div>
+          </div>
+          <div id="ai-decision-list" class="stack"></div>
+        </section>
+
+        <section id="underworld-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">FATE & GENERATIONAL SAGAS</p><h2>Realm of the Dead</h2></div>
+            <span id="underworld-status" class="pill">Balanced</span>
+          </div>
+          <div id="underworld-summary" class="summary-card"></div>
+          <div id="underworld-region-list" class="stack"></div>
+
+          <div class="section-heading subheading">
+            <div><p class="eyebrow">SOUL JUDGMENT</p><h2>Awaiting Souls</h2></div>
+          </div>
+          <div id="soul-list" class="stack"></div>
+
+          <div class="section-heading subheading">
+            <div><p class="eyebrow">SPIRIT HEROES</p><h2>Champions Beyond Death</h2></div>
+          </div>
+          <div id="spirit-hero-list" class="stack"></div>
+        </section>
+
+        <section id="living-olympus-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">FATE & GENERATIONAL SAGAS</p><h2>Divine Capital</h2></div>
+            <span id="living-olympus-status" class="pill">Olympus Active</span>
+          </div>
+          <div id="living-olympus-summary" class="summary-card"></div>
+          <div id="living-olympus-location-list" class="stack"></div>
+          <div class="section-heading subheading">
+            <div><p class="eyebrow">DIVINE INVENTORY</p><h2>Relics & Equipment</h2></div>
+          </div>
+          <div id="divine-inventory-list" class="stack"></div>
+        </section>
+
+        <section id="avatar-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">DIVINE AVATAR</p><h2>Descend Into the World</h2></div>
+            <span id="avatar-form-label" class="pill">Divine Form</span>
+          </div>
+          <div id="avatar-summary" class="summary-card"></div>
+          <div id="avatar-form-list" class="stack"></div>
+          <div class="section-heading subheading">
+            <div><p class="eyebrow">DIRECT ACTIONS</p><h2>Walk Among Mortals</h2></div>
+          </div>
+          <div id="avatar-action-list" class="stack"></div>
+        </section>
+
+        <section id="divine-politics-view" class="view">
+          <div class="section-heading"><div><p class="eyebrow">DIVINE POLITICS</p><h2>Gods & Rivalries</h2></div><span id="divine-politics-status" class="pill">Olympus Watchful</span></div>
+          <div id="divine-politics-summary" class="summary-card"></div>
+          <div id="divine-politics-list" class="stack"></div>
+        </section>
+        <section id="titan-council-view" class="view">
+          <div class="section-heading"><div><p class="eyebrow">SECRET TITAN COUNCIL</p><h2>Rebellion & Intrigue</h2></div><span id="titan-council-status" class="pill">Hidden</span></div>
+          <div id="titan-council-summary" class="summary-card"></div>
+          <div id="titan-council-list" class="stack"></div>
+        </section>
+        <section id="reputation-view" class="view">
+          <div class="section-heading"><div><p class="eyebrow">DIVINE REPUTATION</p><h2>Your Immortal Legacy</h2></div><span id="reputation-title" class="pill">Unproven</span></div>
+          <div id="reputation-summary" class="summary-card"></div>
+          <div id="reputation-list" class="stack"></div>
+        </section>
+
+        <section id="worlds-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">BEYOND GREECE</p><h2>Ancient Civilizations</h2></div>
+            <span id="civilization-count" class="pill">0 Known</span>
+          </div>
+          <div id="world-expansion-summary" class="summary-card"></div>
+          <div id="civilization-list" class="stack"></div>
+        </section>
+
+        <section id="naval-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">SEAS OF POSEIDON</p><h2>Fleets & Exploration</h2></div>
+            <span id="fleet-count" class="pill">0 Fleets</span>
+          </div>
+          <div id="naval-summary" class="summary-card"></div>
+          <div id="fleet-list" class="stack"></div>
+          <div class="section-heading subheading">
+            <div><p class="eyebrow">DISCOVERIES</p><h2>Islands & Ruins</h2></div>
+          </div>
+          <div id="discovery-list" class="stack"></div>
+        </section>
+
+        <section id="wonders-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">MONUMENTS OF THE WORLD</p><h2>World Wonders</h2></div>
+            <span id="wonder-count" class="pill">0 Completed</span>
+          </div>
+          <div id="wonder-summary" class="summary-card"></div>
+          <div id="wonder-list" class="stack"></div>
+        </section>
+
+        <section id="olympics-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">PANHELLENIC GLORY</p><h2>Olympic Games</h2></div>
+            <span id="olympic-year-label" class="pill">Next Games</span>
+          </div>
+          <div id="olympic-summary" class="summary-card"></div>
+          <div id="olympic-event-list" class="stack"></div>
+        </section>
+
+
+
+        <section id="sagas-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">GENERATIONS & CONSEQUENCES</p><h2>Living Sagas</h2></div>
+            <span id="saga-count" class="pill">0 Active</span>
+          </div>
+          <div id="saga-summary" class="summary-card"></div>
+          <div id="saga-list" class="stack"></div>
+          <div class="section-heading subheading">
+            <div><p class="eyebrow">BLOODLINES</p><h2>Generational Houses</h2></div>
+          </div>
+          <div id="bloodline-list" class="stack"></div>
+        </section>
+
+        <section id="living-chronicle-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">FATE & GENERATIONAL SAGAS</p><h2>History of Your World</h2></div>
+            <span id="chronicle-year-label" class="pill">Year 1</span>
+          </div>
+          <div id="chronicle-summary" class="summary-card"></div>
+          <div class="chronicle-filter-row">
+            <button class="chronicle-filter active" data-chronicle-filter="all">All</button>
+            <button class="chronicle-filter" data-chronicle-filter="divine-family">Family</button>
+            <button class="chronicle-filter" data-chronicle-filter="gods-titans">Gods & Titans</button>
+            <button class="chronicle-filter" data-chronicle-filter="heroes">Heroes</button>
+            <button class="chronicle-filter" data-chronicle-filter="wars">Wars</button>
+            <button class="chronicle-filter" data-chronicle-filter="cities">Cities</button>
+            <button class="chronicle-filter" data-chronicle-filter="underworld">Underworld</button>
+            <button class="chronicle-filter" data-chronicle-filter="council">Council</button>
+            <button class="chronicle-filter" data-chronicle-filter="prayers">Prayers</button>
+            <button class="chronicle-filter" data-chronicle-filter="births">Births</button>
+            <button class="chronicle-filter" data-chronicle-filter="deaths">Deaths</button>
+            <button class="chronicle-filter" data-chronicle-filter="marriages">Marriages</button>
+            <button class="chronicle-filter" data-chronicle-filter="legends">Legends</button>
+          </div>
+          <div id="chronicle-timeline" class="stack"></div>
+          <div class="section-heading subheading">
+            <div><p class="eyebrow">CAMPAIGN LEGACY</p><h2>Your Legacy</h2></div>
+          </div>
+          <div id="legacy-dashboard" class="summary-card"></div>
+        </section>
+
+        <section id="library-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">LIBRARY OF FATE</p><h2>World Encyclopedia</h2></div>
+            <span id="library-entry-count" class="pill">0 Entries</span>
+          </div>
+          <div id="library-summary" class="summary-card"></div>
+          <div class="library-tabs">
+            <button class="library-tab active" data-library-category="all">All</button>
+            <button class="library-tab" data-library-category="people">People</button>
+            <button class="library-tab" data-library-category="places">Places</button>
+            <button class="library-tab" data-library-category="wars">Wars</button>
+            <button class="library-tab" data-library-category="myths">Myths</button>
+            <button class="library-tab" data-library-category="relics">Relics</button>
+          </div>
+          <div id="library-entry-list" class="stack"></div>
+        </section>
+
+        <section id="olympus-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">FATE & GENERATIONAL SAGAS</p><h2>Explore Mount Olympus</h2></div>
+            <span id="olympus-status" class="pill">Divine Court</span>
+          </div>
+          <div id="olympus-summary" class="summary-card"></div>
+          <div id="olympus-location-list" class="stack"></div>
+        </section>
+
+        <section id="fate-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">THREADS OF FATE</p><h2>The Three Fates</h2></div>
+            <span id="fate-balance-label" class="pill">Balanced</span>
+          </div>
+          <div id="fate-summary" class="summary-card"></div>
+          <div id="fate-character-list" class="stack"></div>
+        </section>
+
+        <section id="ages-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">THE GREAT AGES</p><h2>World Era</h2></div>
+            <span id="current-age-label" class="pill">Age of Olympus</span>
+          </div>
+          <div id="age-summary" class="summary-card"></div>
+          <div id="age-list" class="stack"></div>
+        </section>
+
+        <section id="pantheon-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">PANTHEON CREATOR</p><h2>New Gods</h2></div>
+            <span id="custom-god-count" class="pill">0 Created</span>
+          </div>
+          <div id="pantheon-summary" class="summary-card"></div>
+          <div id="custom-god-list" class="stack"></div>
+        </section>
+
+        <section id="family-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">HOUSE OF OLYMPUS</p><h2>Divine Family</h2></div>
+            <span id="demigod-count" class="pill">0 Demigods</span>
+          </div>
+          <div id="family-summary" class="summary-card"></div>
+          <div id="mortal-relationship-list" class="stack"></div>
+          <div class="section-heading subheading">
+            <div><p class="eyebrow">DIVINE DESCENDANTS</p><h2>Demigods</h2></div>
+          </div>
+          <div id="demigod-list" class="stack"></div>
+        </section>
+
+        <section id="legacy-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">LEGENDARY DESTINY</p><h2>Legacy & Victory</h2></div>
+            <span id="victory-status" class="pill">Campaign Active</span>
+          </div>
+          <div id="victory-list" class="stack"></div>
+          <div class="section-heading subheading">
+            <div><p class="eyebrow">HERO BLOODLINES</p><h2>Families & Descendants</h2></div>
+          </div>
+          <div id="bloodline-list" class="stack"></div>
+        </section>
+
+        <section id="titans-view" class="view">
+          <div class="section-heading">
+            <div><p class="eyebrow">PRISONERS OF TARTARUS</p><h2>The Titans</h2></div>
+            <span id="tartarus-status" class="pill">Seals Stable</span>
+          </div>
+          <div id="tartarus-summary" class="summary-card"></div>
+          <div id="titan-list" class="stack"></div>
+        </section>
+
+        <section id="council-view" class="view">
+          <div class="section-heading"><div><p class="eyebrow">FATE & GENERATIONAL SAGAS</p><h2>Olympus Council</h2></div><span id="council-status" class="pill">Council Stable</span></div>
+          <div id="council-summary" class="summary-card"></div>
+          <div id="council-gods" class="council-grid"></div>
+          <div class="section-heading subheading"><div><p class="eyebrow">DIVINE REQUESTS</p><h2>Requests & Favors</h2></div></div>
+          <div id="divine-request-list" class="stack"></div>
+        </section>
+
+        <section id="powers-view" class="view">
+          <div class="section-heading"><div><p class="eyebrow">DIVINE ARSENAL</p><h2>Godly Powers</h2></div><span id="power-count" class="pill">0 Unlocked</span></div>
+          <div id="power-list" class="stack"></div>
+        </section>
+
+        <section id="heroes-view" class="view">
+          <div class="section-heading"><div><p class="eyebrow">LEGENDARY CHAMPIONS</p><h2>Heroes</h2></div><span id="hero-count" class="pill">0 Recruited</span></div>
+          <div id="hero-list" class="stack"></div>
+        </section>
+
+        <section id="monsters-view" class="view">
+          <div class="section-heading"><div><p class="eyebrow">LIVING THREATS</p><h2>Monsters</h2></div><span id="monster-count" class="pill">0 Active</span></div>
+          <div id="monster-list" class="stack"></div>
+        </section>
+
+        <section id="quests-view" class="view">
+          <div class="section-heading"><div><p class="eyebrow">PATHS OF GLORY</p><h2>Quests & Myths</h2></div><span id="quest-count" class="pill">0 Available</span></div>
+          <div id="quest-list" class="stack"></div>
+        </section>
+
+        <section id="throne-view" class="view">
+          <div class="section-heading"><div><p class="eyebrow">MOUNT OLYMPUS</p><h2>Throne Room</h2></div><span id="audience-count" class="pill">0 Waiting</span></div>
+          <div id="audience-list" class="stack"></div>
+        </section>
+
+        <section id="treasury-view" class="view">
+          <div class="section-heading"><div><p class="eyebrow">DIVINE TREASURY</p><h2>Resources</h2></div></div>
+          <div id="treasury-panel"></div>
+        </section>
+
+        <section id="chronicle-view" class="view">
+          <div class="section-heading"><div><p class="eyebrow">IMMORTAL RECORD</p><h2>Chronicle</h2></div></div>
+          <div id="event-log" class="stack"></div>
+          <button id="reset-button" class="danger-button">Reset Game</button>
+        </section>
+      </main>
+
+      
+      <nav class="bottom-nav nav-v2">
+        <button class="nav-category active" data-nav-category="world"><span>🌍</span><strong>World</strong></button>
+        <button class="nav-category" data-nav-category="divine"><span>⚡</span><strong>Divine</strong></button>
+        <button class="nav-category" data-nav-category="heroes"><span>🏆</span><strong>Heroes</strong></button>
+        <button class="nav-category" data-nav-category="mythic"><span>🔥</span><strong>Mythic</strong></button>
+        <button class="nav-category" data-nav-category="realm"><span>🏛️</span><strong>Realm</strong></button>
+        <button class="nav-category" data-nav-category="chronicle"><span>📖</span><strong>Chronicle</strong></button>
+        <button class="nav-category" data-nav-category="alerts"><span>🔔</span><strong>Alerts</strong></button>
+      </nav>
+      <div id="nav-sheet" class="nav-sheet hidden">
+        <div class="nav-sheet-handle"></div>
+        <div class="nav-sheet-header">
+          <div><p class="eyebrow" id="nav-sheet-eyebrow">SECTION</p><h2 id="nav-sheet-title">World</h2></div>
+          <button id="nav-sheet-close" class="icon-button">✕</button>
+        </div>
+        <div id="nav-sheet-grid" class="nav-sheet-grid"></div>
+      </div>
+
+    </section>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <button id="modal-close" class="modal-close">✕</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="game.js"></script>
+</body>
+</html>
